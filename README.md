@@ -1,6 +1,8 @@
 # SongTunes
 Search and listen your favorite songs, powered by iTunes. You can also choose to see the raw json array instead of the formated tracks that can reproduce the song.
 
+![alt tag](http://puu.sh/rqySK/5314d70078.png)
+
 Libraries:
 - RxJava, RxAndroid, RxBidings.
 - Retrofit2, OkHttp.
