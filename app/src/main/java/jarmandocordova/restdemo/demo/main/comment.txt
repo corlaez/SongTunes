@@ -1,0 +1,4 @@
+Demo es un modulo unico de este app que pretende ser modulo unico.
+
+Main es la primera pantalla y aqui adentro estaran sus adapters e interfaces para funcionar.
+Incluyendo entities y business rules implementations.
