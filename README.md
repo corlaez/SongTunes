@@ -12,7 +12,11 @@ But this project is already working quite smoothly and I will be improving it on
 What it needs:
 - Avoid another http request upon changing the view format (tracks vs raw).
 - Refactor main activity, organize the Observers.
-- Use Dagger in a more modular way. (Network module, MainActivityModule?).
+- Use Dagger in a more modular way. (Network module, MainActivity module?).
 - Add Local Cache (I would go with PaperDB).
 - Tests (:s).
 - Changing the play icon to a pause icon when playing, revert it back when the song stops playing.
+
+Thanks to:
+@pablojohnson88. His speech at DevFest introduced me to ReactiveX and concepts and tools for a better architecture.
+@mgouline. This proyect is based on his dagger2-demo (android-samples).
