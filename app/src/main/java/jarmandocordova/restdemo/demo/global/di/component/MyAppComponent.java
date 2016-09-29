@@ -7,7 +7,6 @@ import jarmandocordova.restdemo.demo.global.MyApp;
 import jarmandocordova.restdemo.demo.global.di.module.ApplicationModule;
 import jarmandocordova.restdemo.demo.main.view.MainActivity;
 import jarmandocordova.restdemo.demo.global.gateway.itunes.ITunesApi;
-import jarmandocordova.restdemo.lib.retrofit2.main.ITunesRetrofitProvider;
 
 /**
  * Component for {@link MyApp}.
@@ -25,8 +24,6 @@ public interface MyAppComponent {
     void inject(MyApp application);
     /** Se encarga de inyectar todas las dependencias anotadas en la clase de la instancia parametro**/
     void inject(MainActivity activity);
-    /** Se encarga de inyectar todas las dependencias anotadas en la clase de la instancia parametro**/
-    void inject(ITunesRetrofitProvider iTunesRetrofitProvider);
-    /** Se encarga de inyectar todas las dependencias anotadas en la clase de la instancia parametro**/
+     /** Se encarga de inyectar todas las dependencias anotadas en la clase de la instancia parametro**/
     void inject(ITunesApi iTunesApiRetrofit);
 }

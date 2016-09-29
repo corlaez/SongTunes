@@ -15,8 +15,7 @@ import dagger.Module;
 import dagger.Provides;
 import jarmandocordova.restdemo.demo.global.MyApp;
 import jarmandocordova.restdemo.demo.global.gateway.itunes.ITunesApi;
-import jarmandocordova.restdemo.demo.main.gateway.ITunesProvider;
-import jarmandocordova.restdemo.lib.retrofit2.main.ITunesRetrofitProvider;
+import jarmandocordova.restdemo.demo.main.gateway.MainITunesGateway;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
@@ -33,11 +32,12 @@ import retrofit.RxJavaCallAdapterFactory;
 public class ApplicationModule {
     private final MyApp mApplication;
 
-    private ITunesProvider iTunesProvider;
+    private MainITunesGateway mainITunesRepository;
+    //private ITunesProvider iTunesProvider;
     private ITunesApi iTunesApiRetrofit;
 
     public ApplicationModule(MyApp application) {
-        mApplication = application;
+        this.mApplication = application;
 
         OkHttpClient client = new OkHttpClient();
         client.interceptors().add(new LoggingInterceptor());
@@ -49,8 +49,7 @@ public class ApplicationModule {
 
         iTunesApiRetrofit = retrofitITunes.create(ITunesApi.class);
 
-        iTunesProvider = new ITunesRetrofitProvider();
-        iTunesProvider.inject(iTunesApiRetrofit);
+       // mainITunesRepository = .inject(iTunesApiRetrofit);
     }
 
     @Provides
@@ -59,12 +58,12 @@ public class ApplicationModule {
         return mApplication;
     }
 
-    @Provides
+   /* @Provides
     @Singleton
     ITunesProvider provideITunesProvider() {
         return iTunesProvider;
     }
-
+*/
     @Provides
     @Singleton
     ITunesApi provideITunesApiRetrofit() {

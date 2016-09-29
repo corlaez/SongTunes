@@ -15,16 +15,12 @@ import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.jakewharton.rxbinding.widget.TextViewTextChangeEvent;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -32,11 +28,10 @@ import butterknife.OnClick;
 import jarmandocordova.restdemo.R;
 import jarmandocordova.restdemo.demo.global.MyApp;
 import jarmandocordova.restdemo.demo.global.gateway.itunes.ITunesTrack;
-import jarmandocordova.restdemo.demo.main.gateway.ITunesProvider;
+import jarmandocordova.restdemo.demo.main.gateway.MainITunesGateway;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -51,8 +46,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @InjectView(R.id.etTerm)
     EditText etTerm;
 
-    @Inject
-    ITunesProvider iTunesProvider;
+    MainITunesGateway mainITunesGateway;
 
     TracksRVAdapter tracksRvAdapter;
     String lastSuccesfulSearch = "";
@@ -69,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.inject(this);
         MyApp.from(this).getComponent().inject(this);
 
+        mainITunesGateway = new MainITunesGateway();
         tracksRvAdapter = new TracksRVAdapter(new ITunesTrack[]{}, this);
         rvArray.setAdapter(tracksRvAdapter);
         rvArray.setLayoutManager(new LinearLayoutManager(this));
@@ -81,6 +76,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void call(TextViewTextChangeEvent textViewTextChangeEvent) {
                         //Toast.makeText(MainActivity.this, "Debounced", Toast.LENGTH_SHORT).show();
                         searchTracks();
+                    }
+                })
+                .doOnError(new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Log.e("error", throwable.getMessage());
+                        String s = Log.getStackTraceString(throwable);
+                        tvResponse.setText(getErrorString());
                     }
                 })
                 .subscribe();
@@ -105,14 +108,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         final String termx = term;
 
         if (!toProvider.isChecked()) {
-            iTunesProvider
-                    .getSearchResult(term)
+            mainITunesGateway
+                    .getJsonArray(term)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(new Action1<JsonObject>() {
+                    .doOnNext(new Action1<JsonArray>() {
                         @Override
-                        public void call(JsonObject jsonObject) {
+                        public void call(JsonArray jsonArray) {
                             toast.cancel();
-                            ITunesTrack[] arr = new Gson().fromJson(jsonObject.getAsJsonArray("results"), ITunesTrack[].class);
+                            ITunesTrack[] arr = new Gson().fromJson(jsonArray, ITunesTrack[].class);
                             Log.i("RetrofitRX", Arrays.deepToString(arr));
                             tracksRvAdapter.setArray(arr);
                             tracksRvAdapter.notifyDataSetChanged();
@@ -130,15 +133,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }).subscribe();
         } else {
-            iTunesProvider
-                    .getSearchResult(term)
+            mainITunesGateway
+                    .getJsonArray(term)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .map(new Func1<JsonObject, JsonArray>() {
-                        @Override
-                        public JsonArray call(JsonObject jsonObject) {
-                            return jsonObject.getAsJsonArray("results");
-                        }
-                    })
                     .doOnNext(new Action1<JsonArray>() {
                         @Override
                         public void call(JsonArray jsonElements) {
@@ -176,7 +173,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         final TracksRVAdapter.MyViewHolder holder = (TracksRVAdapter.MyViewHolder) v.getTag();
-
         if (v.getTag() != null) {
             final String url = holder.getPreviewUrl();
             if (currentUrl.equals(url)) {
@@ -206,33 +202,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         return false;
                     }
                 }
-            })
-                    .doOnError(new Action1<Throwable>() {
-                        @Override
-                        public void call(Throwable throwable) {
-                            Log.e("","",throwable);
-                            currentUrl = "";
-                            pbProgress.setVisibility(View.GONE);
-                        }
-                    })
-            .subscribeOn(Schedulers.newThread())
+            }).doOnError(new Action1<Throwable>() {
+                @Override
+                public void call(Throwable throwable) {
+                    Log.e("", "", throwable);
+                    currentUrl = "";
+                    pbProgress.setVisibility(View.GONE);
+                }
+            }).subscribeOn(Schedulers.newThread())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean aBoolean) {
                             pbProgress.setVisibility(View.GONE);
                         }
-                    })
-            .subscribe();
+                    }).subscribe();
         }
     }
 
-    private String getSuccessString(String term){
+    private String getSuccessString(String term) {
         //RAW
-        if(toProvider.isChecked()){
+        if (toProvider.isChecked()) {
             //no items
-            if(tracksRvAdapter.getItemCount() == 0){
-                if(term == null || term.equals("")){
+            if (tracksRvAdapter.getItemCount() == 0) {
+                if (term == null || term.equals("")) {
                     return "No input text, no raw json.";
                 }
             }
@@ -240,22 +233,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         //TRACKS
         //no items
-        if(tracksRvAdapter.getItemCount() == 0){
-            if(term == null || term.equals("")){
+        if (tracksRvAdapter.getItemCount() == 0) {
+            if (term == null || term.equals("")) {
                 return "No input text, no tracks.";
-            }
-            else {
-                return "Sorry, no tracks found for: "+ term;
+            } else {
+                return "Sorry, no tracks found for: " + term;
             }
         }
-        return "Showing "+ tracksRvAdapter.getItemCount() +" tracks for: "+ term;
+        return "Showing " + tracksRvAdapter.getItemCount() + " tracks for: " + term;
     }
 
-    private String getErrorString(){
+    private String getErrorString() {
         return "Oops, error.";
     }
 
-    private String getWaitString(){
+    private String getWaitString() {
         return "Please wait...";
     }
 }

@@ -7,7 +7,7 @@ import java.util.Arrays;
  */
 
 public class SearchResult {
-    private ITunesTrack[] results;
+    private ITunesTrack[] results = new ITunesTrack[]{};
 
     public ITunesTrack[] getResults() {
         return results;

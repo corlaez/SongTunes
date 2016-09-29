@@ -12,7 +12,7 @@ import rx.Observable;
  */
 
 public interface ITunesProvider {
-    void inject(ITunesApi iTunesApiRetrofit);
+    //void inject(ITunesApi iTunesApiRetrofit);
 
     Observable<JsonObject> getSearchResult(@Query("term") String term);
 
