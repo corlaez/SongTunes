@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.inject(this);
         MyApp.from(this).getComponent().inject(this);
 
-        mainITunesGateway = new MainITunesGateway();
+        mainITunesGateway = new MainITunesGateway(this);
         tracksRvAdapter = new TracksRVAdapter(new ITunesTrack[]{}, this);
         rvArray.setAdapter(tracksRvAdapter);
         rvArray.setLayoutManager(new LinearLayoutManager(this));

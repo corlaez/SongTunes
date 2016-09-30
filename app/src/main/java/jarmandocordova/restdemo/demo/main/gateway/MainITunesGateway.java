@@ -1,11 +1,14 @@
 package jarmandocordova.restdemo.demo.main.gateway;
 
+import android.content.Context;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 import javax.inject.Inject;
 
+import jarmandocordova.restdemo.demo.global.MyApp;
 import jarmandocordova.restdemo.demo.global.gateway.itunes.ITunesApi;
 import jarmandocordova.restdemo.demo.global.gateway.itunes.ITunesTrack;
 import jarmandocordova.restdemo.demo.global.gateway.itunes.SearchResult;
@@ -20,6 +23,10 @@ public class MainITunesGateway {
     @Inject
     ITunesApi iTunesApi;
     //TODO add LocalCache
+
+    public MainITunesGateway(Context context){
+        MyApp.from(context).getComponent().inject(this);
+    }
 
     public Observable<JsonArray> getJsonArray(String term){
         if(iTunesApi == null){

@@ -5,6 +5,7 @@ import javax.inject.Singleton;
 import dagger.Component;
 import jarmandocordova.restdemo.demo.global.MyApp;
 import jarmandocordova.restdemo.demo.global.di.module.ApplicationModule;
+import jarmandocordova.restdemo.demo.main.gateway.MainITunesGateway;
 import jarmandocordova.restdemo.demo.main.view.MainActivity;
 import jarmandocordova.restdemo.demo.global.gateway.itunes.ITunesApi;
 
@@ -19,11 +20,10 @@ import jarmandocordova.restdemo.demo.global.gateway.itunes.ITunesApi;
 @Singleton
 @Component(modules = ApplicationModule.class)
 public interface MyAppComponent {
-    //MyApp getMyApp();
     /** Se encarga de inyectar todas las dependencias anotadas en la clase de la instancia parametro**/
     void inject(MyApp application);
     /** Se encarga de inyectar todas las dependencias anotadas en la clase de la instancia parametro**/
     void inject(MainActivity activity);
      /** Se encarga de inyectar todas las dependencias anotadas en la clase de la instancia parametro**/
-    void inject(ITunesApi iTunesApiRetrofit);
+    void inject(MainITunesGateway mainITunesGateway);
 }
